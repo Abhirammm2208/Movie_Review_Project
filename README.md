@@ -17,7 +17,7 @@ In the project directory, you can run:
 
 Runs the app in the development mode.\
 Note to make changes accordingly in both client and server .env file
-client [http://localhost:3000] server(http://localhost:5000) to view it in your browser.
+client (http://localhost:3000) server (http://localhost:5000) to view it in your browser.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
