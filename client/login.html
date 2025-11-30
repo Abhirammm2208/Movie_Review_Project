@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login • Movie Reviews</title>
+  <link rel="stylesheet" href="./css/styles.css" />
+  <script defer src="./js/api.js"></script>
+  <script defer src="./js/login.js"></script>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand"><span class="logo"></span> Movie Reviews</div>
+      <div class="links">
+        <a href="./index.html">Home</a>
+        <a href="./register.html">Register</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <h2>Welcome back</h2>
+      <p class="muted">Sign in to add reviews.</p>
+      <form id="loginForm" class="stack">
+        <div>
+          <label for="email">Email</label>
+          <input id="email" type="email" required />
+        </div>
+        <div>
+          <label for="password">Password</label>
+          <input id="password" type="password" minlength="6" required />
+        </div>
+        <div class="row">
+          <button class="btn primary" type="submit">Login</button>
+          <a class="right" href="./register.html">Need an account?</a>
+        </div>
+        <div class="row">
+          <div id="msg" class="muted"></div>
+          <span class="right muted">API: <code id="apiBase"></code></span>
+        </div>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
