@@ -16,10 +16,6 @@
     {
       "src": "/api/(.*)",
       "dest": "https://movie-review-server-two.vercel.app/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
     }
   ]
 }
