@@ -3,8 +3,10 @@ require('dotenv').config();
 
 const connectDB = async () => {
     try {
-        console.log('MONGO_URI:', process.env.MONGO_URI); // Debug line to ensure MONGO_URI is read correctly
-        await mongoose.connect(process.env.MONGO_URI);
+        const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
+        console.log('DB URI present:', !!uri);
+        if(!uri) throw new Error('Missing MONGO_URI/MONGODB_URI environment variable');
+        await mongoose.connect(uri);
         console.log('MongoDB connected...');
     } catch (err) {
         console.error(err.message);

@@ -82,8 +82,17 @@ app.get("/", async (req, res) => {
   return res.status(200).send({ message: "App is running" });
 });
 
+// Health endpoint for monitoring
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ ok: true, db: !!(require('mongoose').connection && require('mongoose').connection.readyState === 1) });
+});
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-
+// In Vercel serverless, we export the app as the handler
 module.exports = app;
+
+// Also start a local server when not running in Vercel
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+}
