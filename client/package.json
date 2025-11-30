@@ -9,7 +9,7 @@
     "preview": "vite preview --port 5173"
   },
   "dependencies": {
-    "freekeys": "^1.0.0"
+    "freekeys": "^0.0.4"
   },
   "devDependencies": {
     "vite": "^5.4.0"
