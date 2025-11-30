@@ -11,12 +11,13 @@ const router = express.Router();
 // @desc    Get reviews for a movie
 // @access  Public
 router.get('/:movieName', async (req, res) => {
+    const movieName = req.params.movieName;
     try {
-        const reviews = await Review.find({ movieName: req.params.movieName }).populate('reviewer', ['username']);
+        const reviews = await Review.find({ movieName }).populate('reviewer', ['username']);
         res.json(reviews);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
+        console.error('GET /api/reviews/' + movieName + ' failed:', err);
+        res.status(500).json({ error: 'Server error fetching reviews', details: err.message });
     }
 });
 
@@ -57,8 +58,8 @@ router.post(
 
             res.json(review);
         } catch (err) {
-            console.error(err.message);
-            res.status(500).send('Server error');
+            console.error('POST /api/reviews failed:', err);
+            res.status(500).json({ error: 'Server error saving review', details: err.message });
         }
     }
 );
