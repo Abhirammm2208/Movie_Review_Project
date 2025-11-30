@@ -63,11 +63,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // CORS configuration
 const corsOptions = {
   origin: [
-    `https://client-lake-seven.vercel.app/`,
-    `https://backend-flame-seven-50.vercel.app/`,
+    'https://moview-review-client.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:5000',
     '*'
   ],
-
   // Add your React app's URL
   methods: ["GET", "POST", "OPTIONS", "PATCH", "DELETE", "PUT"],
   credentials: true // If you need to send cookies with the request
