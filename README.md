@@ -14,50 +14,69 @@ The Movie Review Website is a platform designed for users to browse movies and r
 
 
 
-# Getting Started with Create React App
+## Client (Frontend)
 
-This project was bootstrapped with [Create React App].
+A minimal, framework-free client has been added under `client/` to work with the existing backend without changing any server logic. It supports:
 
-## Available Scripts
+- Login, register, logout
+- Search reviews for a movie
+- Add a new review (requires login)
 
-In the project directory, you can run:
+Pages:
 
-### `npm start`
+- `client/index.html` — Search and list reviews
+- `client/login.html` — Sign in
+- `client/register.html` — Create account
+- `client/add-review.html` — Create a review
 
-Runs the app in the development mode.\
-Note to make changes accordingly in both client and server .env file
-client (http://localhost:3000) server (http://localhost:5000) to view it in your browser.
+### Run the client locally
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Option A — Vite dev server with proxy (recommended):
 
-### `npm test`
+```pwsh
+cd client
+npm install
+npm run dev
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Open http://localhost:5173. All requests to `/api/*` are proxied to `http://localhost:5000` (no CORS hassles).
 
-### `npm run build`
+Option B — Serve static files:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```pwsh
+# Python (if installed)
+python -m http.server 5173 -d client
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# Or npx serve
+npx serve client -l 5173
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+When serving statically, the client defaults to `http://localhost:5000`. To target a different backend:
 
-### `npm run eject`
+```js
+localStorage.setItem('API_BASE_URL','https://your-backend-host');
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Optional: Real movie posters (TMDB)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The home page can show real posters via TMDB. Set an API key in the browser:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```js
+// In DevTools Console on http://localhost:5173
+localStorage.setItem('TMDB_API_KEY','<your_tmdb_api_key>')
+location.reload()
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+If no key is set, the client falls back to placeholder images.
 
-## Learn More
+### Backend
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Start the API server as usual (defaults to `http://localhost:5000`). The client calls:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- `POST /api/auth/signup` — register
+- `POST /api/auth/signin` — login (stores returned JWT)
+- `POST /api/auth/signout` — logout
+- `GET /api/reviews/:movieName` — list reviews for movie
+- `POST /api/reviews` — create review (Authorization: `Bearer <token>`)
+
+No backend changes were made for the client.
