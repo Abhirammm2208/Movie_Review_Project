@@ -1,101 +1,148 @@
-﻿# Movie_review_project
+﻿<h1 align="center">Movie Review Project</h1>
 
-### Deployment
+Modern full‑stack movie review application built with a Node.js / Express / MongoDB backend and a lightweight Vite‑bundled vanilla JS frontend. Users can register, sign in, and create or view reviews for any movie title.
 
-This repository now uses a single Vercel project (root `vercel.json`) to deploy:
+## Table of Contents
+1. Overview  
+2. Features  
+3. Tech Stack  
+4. Repository Structure  
+5. Backend API  
+6. Data Models  
+7. Frontend Pages  
+8. Local Development  
+9. Environment Variables  
+10. Deployment (Vercel + GitHub Actions)  
+11. Future Improvements  
 
-- Serverless API (Express) from `backend/server.js` at paths `/api/*`
-- Static frontend built by Vite from `client/` (output copied to `client/dist`)
+## 1. Overview
+This project provides a simple authenticated review system. The backend exposes REST endpoints for auth and reviews; the frontend consumes them and handles JWT persistence in `localStorage`.
 
-GitHub Actions workflow (`.github/workflows/deploy.yml`) can be adapted or you can let Vercel auto‑deploy on push.
+Posters can be optionally enhanced using TMDB (via the `freekeys` package which retrieves a free key) — if unavailable, placeholder styling is shown.
 
-Environment variables are NOT stored in the repository—set them in Vercel:
+## 2. Features
+- User registration & login (JWT based)
+- Protected review creation (Bearer token)
+- Fetch and list reviews by movie name
+- Simple client-side search box for movies
+- Optional TMDB poster lookup (graceful fallback when missing)
+- Health check endpoint for deployment verification
 
-Required (Production):
+## 3. Tech Stack
+- **Backend:** Node.js, Express, Mongoose, JWT, bcryptjs
+- **Frontend:** HTML, CSS, ES Modules, Vite build & dev proxy
+- **Auth:** JSON Web Tokens (stored in browser `localStorage`)
+- **Database:** MongoDB Atlas (or any MongoDB instance)
+- **Deployment:** Vercel (serverless for API + static build for client)
+- **CI/CD:** GitHub Actions workflow for automated Vercel deploys
+
+## 4. Repository Structure
 ```
-MONGO_URI=<your mongodb atlas uri>
-JWT_SECRET=<your secret>
-```
-Optional:
-```
-VITE_API_BASE_URL=https://<your-domain-or-vercel-url>
+backend/          Express server, routes, models, middleware
+client/           Frontend source (multi-page HTML + JS modules)
+vercel.json       Unified Vercel build & routing config
+.github/workflows/deploy.yml  CI deploy pipeline
 ```
 
-**🚀 For detailed setup instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)**
+## 5. Backend API
+Base path in production: `https://<your-vercel-domain>/api`
 
-# Project Description
-The Movie Review Website is a platform designed for users to browse movies and read or submit reviews. It features user authentication for signup, login, and logout functionalities. Users can add reviews for movies, view existing reviews, and interact with the website efficiently. A standout feature of our project is we are fetching the movie data directly from IMDb through an API call. This ensures our users always have access to the most current and comprehensive list of films.
-# Features
-- User Authentication: Secure signup, login, and logout functionalities.
-- Automatic Movie Integration: Movies are automatically added from the IMDb API, ensuring a comprehensive and up-to-date database.
-- Add and View Reviews: Users can submit their own reviews and read reviews from other users.
-- Detailed Movie Information: Each movie entry includes titles, release dates, cast, crew, plot summaries, genres, and ratings from IMDb.
+Auth:
+- `POST /api/auth/signup` – Create user
+- `POST /api/auth/signin` – Login, returns JWT
+- `POST /api/auth/signout` – Client clears stored token (endpoint optional)
 
+Reviews:
+- `GET /api/reviews/:movieName` – List reviews for a movie
+- `POST /api/reviews` – Create review (requires `Authorization: Bearer <token>`)  
+	Body example:
+	```json
+	{
+		"movieName": "Inception",
+		"rating": 9,
+		"comment": "Mind-bending visuals!"
+	}
+	```
 
+Utility:
+- `GET /api/health` – `{ ok: true, db: true }` when connected
 
-## Client (Frontend)
+## 6. Data Models (Simplified)
+### User
+Fields: `fullName`, `username`, `email`, `passwordHash`
 
-A minimal, framework-free client has been added under `client/` to work with the existing backend without changing any server logic. It supports:
+### Review
+Fields: `movieName`, `rating`, `comment`, `user` (ref), `createdAt`
 
-- Login, register, logout
-- Search reviews for a movie
-- Add a new review (requires login)
+## 7. Frontend Pages
+- `index.html` – Search & list reviews
+- `login.html` – Sign in
+- `register.html` – Account creation
+- `add-review.html` – Submit a new review (auth required)
 
-Pages:
+Scripts are bundled by Vite; production HTML references hashed assets in `/assets/`.
 
-- `client/index.html` — Search and list reviews
-- `client/login.html` — Sign in
-- `client/register.html` — Create account
-- `client/add-review.html` — Create a review
+## 8. Local Development
+### Prerequisites
+- Node.js 18+
+- MongoDB connection string
 
-### Run the client locally
+### Backend
+```pwsh
+cd backend
+npm install
+npm start
+```
+Server runs by default at `http://localhost:5000`.
 
-Option A — Vite dev server with proxy (recommended):
-
+### Frontend (Dev with Proxy)
 ```pwsh
 cd client
 npm install
 npm run dev
 ```
+Open `http://localhost:5173` – calls to `/api/*` are proxied to the backend.
 
-Open http://localhost:5173. All requests to `/api/*` are proxied to `http://localhost:5000` (no CORS hassles).
-
-Option B — Serve static files:
-
+### Frontend (Production Build)
 ```pwsh
-# Python (if installed)
-python -m http.server 5173 -d client
-
-# Or npx serve
-npx serve client -l 5173
+cd client
+npm run build
 ```
+Artifacts in `client/dist/`.
 
-When serving statically, the client defaults to `http://localhost:5000`. To target a different backend:
-
-```js
-localStorage.setItem('API_BASE_URL','https://your-backend-host');
+## 9. Environment Variables
+Set these in Vercel (or a local `.env` for backend):
 ```
-
-### Optional: Real movie posters (TMDB)
-
-The home page can show real posters via TMDB. Set an API key in the browser:
-
-```js
-// In DevTools Console on http://localhost:5173
-localStorage.setItem('TMDB_API_KEY','<your_tmdb_api_key>')
-location.reload()
+MONGO_URI=<mongodb connection string>
+JWT_SECRET=<strong secret>
 ```
+Fallback variable name `MONGODB_URI` is also accepted by the connection logic.
 
-If no key is set, the client falls back to placeholder images.
+No frontend build-time vars are strictly required; API base is inferred. Poster enhancement via TMDB occurs automatically if `freekeys` provides a key.
 
-### Backend
+## 10. Deployment
+### Vercel (Unified)
+`vercel.json` builds:
+- Serverless API from `backend/server.js` → `/api/*`
+- Static client from `client/` → root HTML pages
 
-Start the API server as usual (defaults to `http://localhost:5000`). The client calls:
+### GitHub Actions
+Workflow at `.github/workflows/deploy.yml` deploys backend first, then client (two Vercel projects). Ensure secrets:
+```
+VERCEL_TOKEN
+VERCEL_ORG_ID
+VERCEL_PROJECT_ID_BACKEND
+VERCEL_PROJECT_ID_CLIENT
+```
+Plus production environment variables (`MONGO_URI`, `JWT_SECRET`) configured in each Vercel project.
 
-- `POST /api/auth/signup` — register
-- `POST /api/auth/signin` — login (stores returned JWT)
-- `POST /api/auth/signout` — logout
-- `GET /api/reviews/:movieName` — list reviews for movie
-- `POST /api/reviews` — create review (Authorization: `Bearer <token>`)
+## 11. Future Improvements (Not Yet Implemented)
+- Centralized logging & monitoring
+- Client-side form validation enhancements (password strength, etc.)
+- Review edit & delete endpoints
+- Rate limiting & spam protection
 
-No backend changes were made for the client.
+---
+**Status:** Core auth & review functionality working in production.
+
+Feel free to open issues or PRs for improvements.
