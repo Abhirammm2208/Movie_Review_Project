@@ -11,5 +11,8 @@ export default defineConfig({
         secure: false
       }
     }
+  },
+  esbuild: {
+    target: 'esnext'
   }
 });
