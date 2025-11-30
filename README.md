@@ -2,7 +2,9 @@
 
 ### Deployment
 
-This project is deployed on Vercel : https://moview-review-client.vercel.app/
+This project is deployed on Vercel with automatic CI/CD via GitHub Actions.
+
+**🚀 For detailed deployment setup instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)**
 
 # Project Description
 The Movie Review Website is a platform designed for users to browse movies and read or submit reviews. It features user authentication for signup, login, and logout functionalities. Users can add reviews for movies, view existing reviews, and interact with the website efficiently. A standout feature of our project is we are fetching the movie data directly from IMDb through an API call. This ensures our users always have access to the most current and comprehensive list of films.
