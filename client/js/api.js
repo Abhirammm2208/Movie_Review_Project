@@ -1,4 +1,5 @@
 // Basic API client for the Movie Review backend
+import '../css/styles.css';
 (function(){
   const DEFAULT_BASE = 'http://localhost:5000';
   const stored = localStorage.getItem('API_BASE_URL');

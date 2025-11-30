@@ -13,6 +13,17 @@ export default defineConfig({
     }
   },
   esbuild: {
+      build: {
+        target: 'esnext',
+        rollupOptions: {
+          input: {
+            main: 'index.html',
+            login: 'login.html',
+            register: 'register.html',
+            addreview: 'add-review.html'
+          }
+        }
+      }
     target: 'esnext'
   },
   build: {
