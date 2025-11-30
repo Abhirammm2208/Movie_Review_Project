@@ -2,9 +2,26 @@
 
 ### Deployment
 
-This project is deployed on Vercel with automatic CI/CD via GitHub Actions.
+This repository now uses a single Vercel project (root `vercel.json`) to deploy:
 
-**🚀 For detailed deployment setup instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)**
+- Serverless API (Express) from `backend/server.js` at paths `/api/*`
+- Static frontend built by Vite from `client/` (output copied to `client/dist`)
+
+GitHub Actions workflow (`.github/workflows/deploy.yml`) can be adapted or you can let Vercel auto‑deploy on push.
+
+Environment variables are NOT stored in the repository—set them in Vercel:
+
+Required (Production):
+```
+MONGO_URI=<your mongodb atlas uri>
+JWT_SECRET=<your secret>
+```
+Optional:
+```
+VITE_API_BASE_URL=https://<your-domain-or-vercel-url>
+```
+
+**🚀 For detailed setup instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)**
 
 # Project Description
 The Movie Review Website is a platform designed for users to browse movies and read or submit reviews. It features user authentication for signup, login, and logout functionalities. Users can add reviews for movies, view existing reviews, and interact with the website efficiently. A standout feature of our project is we are fetching the movie data directly from IMDb through an API call. This ensures our users always have access to the most current and comprehensive list of films.
