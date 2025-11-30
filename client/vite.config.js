@@ -1,6 +1,5 @@
-import { defineConfig } from 'vite';
-
-export default defineConfig({
+// Use CommonJS export for CI environments parsing config
+module.exports = {
   server: {
     port: 5173,
     strictPort: true,
@@ -13,20 +12,17 @@ export default defineConfig({
     }
   },
   esbuild: {
-      build: {
-        target: 'esnext',
-        rollupOptions: {
-          input: {
-            main: 'index.html',
-            login: 'login.html',
-            register: 'register.html',
-            addreview: 'add-review.html'
-          }
-        }
-      }
     target: 'esnext'
   },
   build: {
-    target: 'esnext'
+    target: 'esnext',
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        login: 'login.html',
+        register: 'register.html',
+        addreview: 'add-review.html'
+      }
+    }
   }
-});
+};
