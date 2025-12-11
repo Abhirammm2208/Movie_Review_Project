@@ -1,0 +1,20 @@
+<div class="container">
+  <section class="card">
+    <h1>Login</h1>
+    <p class="muted">Access your account to add reviews.</p>
+    <form class="stack" [formGroup]="form" (ngSubmit)="submit()">
+      <div>
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="you@example.com" />
+      </div>
+      <div>
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" />
+      </div>
+      <div class="row" style="justify-content:space-between;align-items:center;gap:10px">
+        <span *ngIf="msg()" [class]="msgClass() || ''">{{ msg() }}</span>
+        <button class="btn primary right" type="submit">Login</button>
+      </div>
+    </form>
+  </section>
+</div>

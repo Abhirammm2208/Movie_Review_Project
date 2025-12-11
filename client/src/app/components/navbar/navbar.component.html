@@ -1,0 +1,19 @@
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" routerLink="/">
+      <span class="logo"></span>
+      <span>Movie Reviews</span>
+    </a>
+    <div class="links">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a routerLink="/add-review" routerLinkActive="active">Add Review</a>
+      <ng-container *ngIf="!authed; else authedBlock">
+        <a routerLink="/login" class="btn">Login</a>
+        <a routerLink="/register" class="btn primary">Register</a>
+      </ng-container>
+      <ng-template #authedBlock>
+        <button class="btn" (click)="logout()">Logout</button>
+      </ng-template>
+    </div>
+  </div>
+</nav>

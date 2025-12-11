@@ -25,3 +25,6 @@ client/dist/
 
 # Vercel local config
 .vercel
+
+# Repo-cleaner artifacts
+bfg.jar

@@ -1,0 +1,30 @@
+<div class="container">
+  <section class="card">
+    <h1>Add a Review</h1>
+    <p class="muted">Share your thoughts and rate the movie.</p>
+    <form class="stack" [formGroup]="form" (ngSubmit)="submit()">
+      <div>
+        <label for="movieName">Movie name</label>
+        <input id="movieName" formControlName="movieName" placeholder="Movie title" />
+      </div>
+
+      <div>
+        <label>Rating</label>
+        <div class="rating-scale">
+          <button type="button" class="rating-btn" *ngFor="let r of [1,2,3,4,5,6,7,8,9,10]"
+            [class.selected]="form.value.rating === r" (click)="setRating(r)">{{ r }}</button>
+        </div>
+      </div>
+
+      <div>
+        <label for="reviewText">Review</label>
+        <textarea id="reviewText" formControlName="reviewText" placeholder="Write your review"></textarea>
+      </div>
+
+      <div class="row" style="justify-content:space-between;align-items:center;gap:10px">
+        <span *ngIf="msg()" [class]="msgClass() || ''">{{ msg() }}</span>
+        <button class="btn primary right" type="submit">Submit</button>
+      </div>
+    </form>
+  </section>
+</div>

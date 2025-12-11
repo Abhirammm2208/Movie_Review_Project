@@ -1,0 +1,33 @@
+<div class="container">
+  <section class="card">
+    <h1>Create an account</h1>
+    <p class="muted">Join to share and track your reviews.</p>
+    <form class="stack" [formGroup]="form" (ngSubmit)="submit()">
+      <div>
+        <label for="fullName">Full name</label>
+        <input id="fullName" formControlName="fullName" />
+      </div>
+      <div>
+        <label for="username">
+          Username
+          <span *ngIf="usernameChecking()" class="muted" style="font-size:12px">(checking…)</span>
+          <span *ngIf="usernameAvailable() === true" class="success" style="font-size:12px">(available)</span>
+          <span *ngIf="usernameAvailable() === false" class="error" style="font-size:12px">(taken)</span>
+        </label>
+        <input id="username" formControlName="username" />
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" />
+      </div>
+      <div>
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" />
+      </div>
+      <div class="row" style="justify-content:space-between;align-items:center;gap:10px">
+        <span *ngIf="msg()" [class]="msgClass() || ''">{{ msg() }}</span>
+        <button class="btn primary right" type="submit">Register</button>
+      </div>
+    </form>
+  </section>
+</div>

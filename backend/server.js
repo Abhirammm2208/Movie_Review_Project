@@ -65,6 +65,7 @@ const corsOptions = {
   origin: [
     'https://moview-review-client.vercel.app',
     'http://localhost:5173',
+    'http://localhost:4200',
     'http://localhost:5000',
     '*'
   ],
