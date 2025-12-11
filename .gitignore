@@ -9,6 +9,10 @@ backend/.env
 client/.env
 !.env.example
 
+# Local environment files with secrets
+client/src/environments/environment.local.ts
+!client/src/environments/environment.local.example.ts
+
 # Logs
 *.log
 npm-debug.log*
