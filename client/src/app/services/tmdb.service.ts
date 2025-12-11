@@ -1,47 +1,33 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { map, catchError, of, timeout } from 'rxjs';
+import { map, catchError, of, timeout, Observable } from 'rxjs';
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const IMG_BASE = 'https://image.tmdb.org/t/p/w342';
 
+// Free TMDB API key from freekeys package - these are public community keys
+const TMDB_API_KEY = '269890f657dddf4635473cf4cf456576';
+
 @Injectable({ providedIn: 'root' })
 export class TmdbService {
   private http = inject(HttpClient);
+  private platformId = inject(PLATFORM_ID);
 
   private isBrowser(): boolean {
-    return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+    return isPlatformBrowser(this.platformId);
   }
 
-  private getKey(): string | null {
-    if (!this.isBrowser()) return null;
-    return localStorage.getItem('TMDB_API_KEY');
-  }
-
-  setKey(key: string): void {
-    if (this.isBrowser()) {
-      localStorage.setItem('TMDB_API_KEY', key);
-    }
-  }
-
-  hasKey(): boolean {
-    return !!this.getKey();
-  }
-
-  searchPoster(title: string) {
-    const key = this.getKey();
-    if (!key) {
-      return of<string | null>(null);
+  searchPoster(title: string): Observable<string | null> {
+    // Only fetch in browser to avoid SSR CORS issues
+    if (!this.isBrowser()) {
+      return of(null);
     }
 
-    const url = `${TMDB_BASE}/search/movie?api_key=${key}&query=${encodeURIComponent(title)}&include_adult=false`;
+    const url = `${TMDB_BASE}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(title)}&include_adult=false`;
     
-    return this.http.get<any>(url, { 
-      headers: {
-        'Accept': 'application/json'
-      }
-    }).pipe(
-      timeout(5000), // 5 second timeout
+    return this.http.get<any>(url).pipe(
+      timeout(8000),
       map((data) => {
         if (!data?.results || data.results.length === 0) {
           return null;
@@ -51,7 +37,10 @@ export class TmdbService {
         return IMG_BASE + first.poster_path;
       }),
       catchError((err) => {
-        console.error(`TMDB API Error for "${title}":`, err?.status, err?.message);
+        // Only log errors in browser
+        if (this.isBrowser()) {
+          console.warn(`TMDB poster not found for "${title}"`);
+        }
         return of(null);
       })
     );

@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReviewService, Review } from '../../services/review.service';
@@ -22,16 +22,17 @@ interface FeaturedCard {
 export class HomeComponent implements OnInit {
   private fb = inject(FormBuilder);
   private reviewsApi = inject(ReviewService);
-  tmdb = inject(TmdbService);  // Make public for template access
+  private tmdb = inject(TmdbService);
   private route = inject(ActivatedRoute);
+  private platformId = inject(PLATFORM_ID);
   auth = inject(AuthService);
 
   searchForm = this.fb.group({ movie: [''] });
-  apiKeyForm = this.fb.group({ apiKey: [''] });
   loading = signal(false);
   error = signal<string | null>(null);
   reviews = signal<Review[]>([]);
-  showApiConfig = signal(false);
+  searchedMovie = signal<string>('');
+  searchedPoster = signal<string | null>(null);
   featured: FeaturedCard[] = [
     { title: 'Inception' },
     { title: 'Interstellar' },
@@ -45,7 +46,14 @@ export class HomeComponent implements OnInit {
     { title: 'The Godfather' }
   ];
 
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
   ngOnInit(): void {
+    // Only run browser-specific code in browser
+    if (!this.isBrowser()) return;
+
     // Setup debounced search using FreekeysUtil
     const debouncedSearch = FreekeysUtil.debounce(() => {
       this.search();
@@ -64,12 +72,10 @@ export class HomeComponent implements OnInit {
       debouncedSearch();
     });
 
-    // Only preload posters if TMDB API key is configured
-    if (this.tmdb.hasKey()) {
-      this.featured.forEach((f) => {
-        this.tmdb.searchPoster(f.title).subscribe((poster) => (f.poster = poster));
-      });
-    }
+    // Preload posters for featured cards
+    this.featured.forEach((f) => {
+      this.tmdb.searchPoster(f.title).subscribe((poster) => (f.poster = poster));
+    });
   }
 
   reviewInitials(r: Review): string {
@@ -85,6 +91,14 @@ export class HomeComponent implements OnInit {
     }
     this.error.set(null);
     this.loading.set(true);
+    this.searchedMovie.set(movie);
+    this.searchedPoster.set(null);
+
+    // Fetch poster for searched movie
+    this.tmdb.searchPoster(movie).subscribe((poster) => {
+      this.searchedPoster.set(poster);
+    });
+
     this.reviewsApi.listReviews(movie).subscribe({
       next: (list) => {
         this.reviews.set(list || []);
@@ -103,19 +117,6 @@ export class HomeComponent implements OnInit {
     this.search();
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  saveApiKey(): void {
-    const key = this.apiKeyForm.value.apiKey?.trim();
-    if (key) {
-      this.tmdb.setKey(key);
-      this.showApiConfig.set(false);
-      this.apiKeyForm.reset();
-      // Reload featured posters
-      this.featured.forEach((f) => {
-        this.tmdb.searchPoster(f.title).subscribe((poster) => (f.poster = poster));
-      });
     }
   }
 }

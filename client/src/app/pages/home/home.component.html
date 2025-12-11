@@ -5,25 +5,8 @@
         <h1>Find Movie Reviews</h1>
         <p class="muted">Search by movie title to see community reviews.</p>
       </div>
-      <button class="btn" type="button" (click)="showApiConfig.set(!showApiConfig())" [style.opacity]="tmdb.hasKey() ? '0.7' : '1'">
-        {{ tmdb.hasKey() ? '✓ TMDB Configured' : 'Configure TMDB' }}
-      </button>
     </div>
     
-    <div *ngIf="showApiConfig()" class="card" style="margin-top:16px;background:#0b1220">
-      <h3>TMDB API Configuration</h3>
-      <p class="muted" style="margin:0 0 12px 0">Get a free API key from <a href="https://www.themoviedb.org/settings/api" target="_blank">themoviedb.org</a></p>
-      <form class="stack" (ngSubmit)="saveApiKey()" [formGroup]="apiKeyForm">
-        <div>
-          <label for="apiKey">API Key</label>
-          <input id="apiKey" type="password" placeholder="Enter your TMDB API key" formControlName="apiKey" />
-        </div>
-        <div class="row" style="gap:8px">
-          <button class="btn primary" type="submit">Save</button>
-          <button class="btn" type="button" (click)="showApiConfig.set(false)">Cancel</button>
-        </div>
-      </form>
-    </div>
 
     <form class="grid cols-2" (ngSubmit)="search()" [formGroup]="searchForm">
       <div class="stack">
@@ -37,22 +20,39 @@
     <div *ngIf="error()" class="error">{{ error() }}</div>
   </section>
 
-  <section class="card" *ngIf="searchForm.value.movie">
-    <div class="row" style="justify-content:space-between;gap:8px;align-items:center">
-      <h3>Results for "{{ searchForm.value.movie }}"</h3>
-      <a class="btn" [routerLink]="['/add-review']" [queryParams]="{ movie: searchForm.value.movie }">Add review</a>
-    </div>
-    <div *ngIf="loading()" class="muted">Loading…</div>
-    <div *ngIf="!loading() && reviews().length === 0" class="muted">No reviews yet. Be the first!</div>
-    <div class="reviews" *ngIf="reviews().length > 0">
-      <div class="card review" *ngFor="let r of reviews()">
-        <div class="row" style="gap:12px">
-          <div class="avatar">{{ reviewInitials(r) }}</div>
-          <div class="badge">{{ r.rating | number:'1.1-1' }}/10</div>
+  <section class="card search-results" *ngIf="searchForm.value.movie">
+    <div class="search-results-layout">
+      <!-- Movie Poster -->
+      <div class="search-poster">
+        <ng-container *ngIf="searchedPoster(); else posterPlaceholder">
+          <img [src]="searchedPoster()" [alt]="searchedMovie()" />
+        </ng-container>
+        <ng-template #posterPlaceholder>
+          <div class="placeholder">{{ searchedMovie() }}</div>
+        </ng-template>
+      </div>
+
+      <!-- Reviews Section -->
+      <div class="search-content">
+        <div class="row" style="justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
+          <h2 style="margin:0">{{ searchedMovie() }}</h2>
+          <a class="btn primary" [routerLink]="['/add-review']" [queryParams]="{ movie: searchedMovie() }">Add review</a>
         </div>
-        <div>
-          <div class="muted">by {{ r.reviewer?.username || 'Anonymous' }}</div>
-          <div>{{ r.reviewText }}</div>
+
+        <div *ngIf="loading()" class="muted" style="margin-top:16px">Loading…</div>
+        <div *ngIf="!loading() && reviews().length === 0" class="muted" style="margin-top:16px">No reviews yet. Be the first!</div>
+
+        <div class="reviews" *ngIf="reviews().length > 0">
+          <div class="card review" *ngFor="let r of reviews()">
+            <div class="row" style="gap:12px">
+              <div class="avatar">{{ reviewInitials(r) }}</div>
+              <div class="badge">{{ r.rating | number:'1.1-1' }}/10</div>
+            </div>
+            <div>
+              <div class="muted">by {{ r.reviewer?.username || 'Anonymous' }}</div>
+              <div>{{ r.reviewText }}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -64,10 +64,6 @@
       <div class="muted">Click to view reviews or add your own</div>
     </div>
     
-    <div *ngIf="!tmdb.hasKey()" class="error" style="margin:12px 0;padding:12px;border-radius:8px;border:1px solid #ef4444;background:rgba(239,68,68,0.1)">
-      <strong>TMDB API Key Required</strong>
-      <p style="margin:8px 0 0 0;font-size:14px">Click "Configure TMDB" at the top to set up your free API key and see movie posters.</p>
-    </div>
 
     <div class="featured-grid">
       <div class="card" *ngFor="let item of featured">
