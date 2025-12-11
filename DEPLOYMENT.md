@@ -75,8 +75,8 @@ Your project has two parts that deploy separately:
 ### Client Configuration
 1. Go to your client project on Vercel
 2. **Settings** → **Environment Variables**
-3. Add these if needed:
-   - `VITE_API_BASE_URL` - Your backend URL (e.g., `https://your-backend.vercel.app`)
+3. Add these variables:
+   - `TMDB_API_KEY` - Your TMDB API key (get free at https://www.themoviedb.org/settings/api)
 
 ## Step 4: Update Client API Configuration
 

@@ -2,12 +2,10 @@ import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { map, catchError, of, timeout, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const IMG_BASE = 'https://image.tmdb.org/t/p/w342';
-
-// Free TMDB API key from freekeys package - these are public community keys
-const TMDB_API_KEY = '269890f657dddf4635473cf4cf456576';
 
 @Injectable({ providedIn: 'root' })
 export class TmdbService {
@@ -24,7 +22,13 @@ export class TmdbService {
       return of(null);
     }
 
-    const url = `${TMDB_BASE}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(title)}&include_adult=false`;
+    const apiKey = environment.tmdbApiKey;
+    if (!apiKey) {
+      console.warn('TMDB API key not configured');
+      return of(null);
+    }
+
+    const url = `${TMDB_BASE}/search/movie?api_key=${apiKey}&query=${encodeURIComponent(title)}&include_adult=false`;
     
     return this.http.get<any>(url).pipe(
       timeout(8000),
